@@ -1,14 +1,14 @@
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export BASE_MODEL='Qwen/Qwen2.5-1.5B-Instruct'
-export PROJECT_NAME='hotpotqa_qwen2.5-1.5b-instruct'
+export BASE_MODEL='Qwen/Qwen2.5-0.5B-Instruct'
+export PROJECT_NAME='math_qwen2.5-0.5b-instruct'
 export EXPERIMENT_NAME=grpo
 export HYDRA_FULL_ERROR=1
 export CUDA_LAUNCH_BLOCKING=1
 
 python3 -m agent_r1.src.main_agent \
     algorithm.adv_estimator=grpo \
-    data.train_files=./data/hotpotqa/train.parquet \
-    data.val_files=./data/hotpotqa/validation.parquet \
+    data.train_files=./data/gsm8k/train.parquet \
+    data.val_files=./data/gsm8k/test.parquet \
     data.train_batch_size=128 \
     data.max_prompt_length=4096 \
     data.max_response_length=4096 \
@@ -26,7 +26,7 @@ python3 -m agent_r1.src.main_agent \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
     actor_rollout_ref.rollout.n_repeat=5 \
@@ -37,9 +37,9 @@ python3 -m agent_r1.src.main_agent \
     trainer.logger=['console','wandb'] \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXPERIMENT_NAME \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=1 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=10 \
     trainer.total_epochs=1 \
-    tool.env='search' $@
+    tool.env='python_executor' $@
